@@ -2,15 +2,23 @@
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoord;
-
+layout (location = 2) in vec3 aNormal;
 out vec2 TexCoord;
+out vec3 Normal;
+out vec3 FragPos;  
 
+
+
+
+//Matrices
 uniform mat4 modelmatrix;
 uniform mat4 viewmatrix;
 uniform mat4 projectionmatrix;
-
 void main()
 {
-	gl_Position = projectionmatrix * viewmatrix * modelmatrix * vec4(aPos, 1.0f);
+	
+	FragPos = vec3(modelmatrix * vec4(aPos, 1.0)); //Fragment position, no es mas que una coordenada del mundo representada en pantalla, (opengl render pipeline se encarga de rellenar el resto :3)
 	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+	Normal = aNormal;
+	gl_Position = projectionmatrix * viewmatrix * modelmatrix * vec4(aPos, 1.0f);
 }

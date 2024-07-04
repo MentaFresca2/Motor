@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Archivos de recursos\NormalShader">
+      <UniqueIdentifier>{f6d6a9ae-fc85-497a-9896-ecffcc40960f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de recursos\LightShader">
+      <UniqueIdentifier>{16bdd283-9490-4054-a1a2-c59fbd667660}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -24,10 +30,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.fr">
-      <Filter>Archivos de recursos</Filter>
+      <Filter>Archivos de recursos\NormalShader</Filter>
     </None>
     <None Include="shader.ver">
-      <Filter>Archivos de recursos</Filter>
+      <Filter>Archivos de recursos\NormalShader</Filter>
+    </None>
+    <None Include="lightshader.fr">
+      <Filter>Archivos de recursos\LightShader</Filter>
+    </None>
+    <None Include="lightshader.ver">
+      <Filter>Archivos de recursos\LightShader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

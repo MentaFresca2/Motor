@@ -31,10 +31,6 @@ int main()
 
     
 
-#define CHECK_GL_ERROR(stmt) do { \
-    stmt; \
-    checkOpenGLError(#stmt, __FILE__, __LINE__); \
-} while (0)
 
 
 
@@ -63,7 +59,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-
+    gladLoadGL();
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) //Inicia GLAD y si no pues da error
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -84,8 +80,8 @@ int main()
     
 
 
-    Shader shader("C:/Users/gutie/source/repos/Motor/Motor/shader.ver", "C:/Users/gutie/source/repos/Motor/Motor/shader.fr"); //Usa el compilador que hice como header y compila el fragment shader y el vertex shader
-   
+    Shader shader("shader.ver", "shader.fr"); //Usa el compilador que hice como header y compila el fragment shader y el vertex shader
+    Shader lightShader("lightshader.ver", "lightshader.fr");
 
 
 
@@ -108,54 +104,50 @@ int main()
 
 
 
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    float vertices[] = {       //coortext     //LightNormals
+        -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,   1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,    0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,   1.0f, 0.0f,    0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 1.0f,    0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 1.0f,    0.0f,  0.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,    0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f,  0.0f,  0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,   1.0f, 1.0f,    0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,   1.0f, 0.0f,    0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,   1.0f, 0.0f,    0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    0.0f, -1.0f,  0.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,    0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,   0.0f, 0.0f,    0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,    0.0f,  1.0f,  0.0f
     };
 
-    unsigned int indices[] = {  //El orden en el que se dibujan los vertizes
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
 
 
     unsigned int VAO; //crea un contenedor
@@ -167,13 +159,25 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //Pasa los datos del tercer argumento (vertizes) al buffer recien creado y le dice para que vamos a usar esos datos
     
     //Pilla los vertices
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    //texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    //Los normales de la luz (vectores normales)
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
 
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    // we only need to bind to the VBO, the container's VBO's data already contains the data.
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // set the vertex attribute 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); //Recuerda poner el stride el numero de columnas del array (ten en cuenta que es un puntero, aunque guardes los datos no pasas al siguiente)
+    glEnableVertexAttribArray(0);
+  
     //Esto es para los indices.
     /*
     unsigned int EBO; //contenedor
@@ -262,26 +266,13 @@ int main()
     shader.use(); // don't forget to activate the shader before setting uniforms!  
     shader.setInt("texture1", 0); //Esto usa el header que hice de compilador.
     shader.setInt("texture2", 1); // Asigna al unidorm 1 la textura 2
+    
+    
 
 
 
 
 
-
-
-
-    glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f,  0.0f,  0.0f),
-    glm::vec3(2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3(2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3(1.3f, -2.0f, -2.5f),
-    glm::vec3(1.5f,  2.0f, -2.5f),
-    glm::vec3(1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
 
 
 
@@ -308,70 +299,107 @@ int main()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //Gestor de errores
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "OpenGL error before glClearColor: " << err << std::endl;
-    }
+
 
 
 
     
     while (!glfwWindowShouldClose(window)) //glfwWindowShouldClose Checkea si window se quiere cerrar y mientras no se quiera cerrar da false.
     {
+        glm::vec4 lightPos(1.2f, 1.0f, 2.0f,1.0);
+
+        glm::mat4 modelmatrix2 = glm::mat4(1.0f);
+        modelmatrix2 = glm::mat4(1.0f);
+        modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(0.0, 0.0, 0.0));
+        modelmatrix2 = glm::scale(modelmatrix2, glm::vec3(0.2f)); // a smaller cube
+        modelmatrix2 = glm::rotate(modelmatrix2, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0, 1.0, 0.0));
+        modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(-10.0, 0.0, 0.0));
+        lightPos = modelmatrix2 * lightPos; //Aqui le estoy aplicando el mismo modelo de rotacion que a la lampara para que asi la luz de la lampara se mueva acorde 
+
         //calculo del delta time
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //Cambia el color de la ventana.
+        glClearColor(0.094f, 0.094f, 0.094f, 1.0f); //Cambia el color de la ventana.
          //Limpia el buffer de profundudad para cambiarlo en el siguiente frame.
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use();
-
+        
+        shader.use(); //Bindea el shader para crear normales
+        glBindVertexArray(VAO); //Bindea el vao para dibujar objetos normales
+       
+        shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        shader.setVec3("lightPos", glm::vec3(lightPos.x, lightPos.y, lightPos.z));//Le paso la posicion de la luz a los objetos normales para la luz
         //Actualizacion de las matrices (se ponen aqui por si quieres mover algo a tiempo real)
             //Creacion de las matrices
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        glm::mat4 view;
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-
-        //RECUERDA INICIALIZAR VARIABLES AQUI
-        unsigned int modelMatrixLoc = glGetUniformLocation(shader.ID, "modelmatrix");
-        
-        unsigned int viewMatrixLoc = glGetUniformLocation(shader.ID, "viewmatrix");
-        glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(view));
-        unsigned int projectMatrixLoc = glGetUniformLocation(shader.ID, "projectionmatrix");
-        glUniformMatrix4fv(projectMatrixLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        glm::mat4 modelmatrix = glm::mat4(1.0f);
        
-  
+        glm::mat4 viewmatrix;
+        viewmatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 projectionmatrix = glm::mat4(1.0f);
+        projectionmatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+
+       
+        shader.setMat4("modelmatrix", modelmatrix);
+        shader.setMat4("viewmatrix", viewmatrix);
+        shader.setMat4("projectionmatrix", projectionmatrix);
         //El primer argumento es que primitivos dibujar.
         //El segundo argumento es la cantidad de indices que usas, 6 en este caso.
         //El tercer argumento es el tipo de dato que usas para los vertices.
         //El cuarto es donde empieza el EBO, en 0 en este caso.
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        lightShader.use();//Usa el shader para la luz
+        glBindVertexArray(lightVAO); //Bindea el Vao para fuentes de luz
+        
+        lightShader.use();
+        lightShader.setMat4("projection", projectionmatrix);
+        lightShader.setMat4("view", viewmatrix);
+        modelmatrix = glm::mat4(1.0f);
+        modelmatrix = glm::translate(modelmatrix, glm::vec3(0.0,0.0,0.0));
+        modelmatrix = glm::scale(modelmatrix, glm::vec3(0.2f)); // a smaller cube
+        modelmatrix = glm::rotate(modelmatrix, (float)glfwGetTime() * glm::radians(50.0f),glm::vec3(0.0,1.0,0.0));
+        modelmatrix = glm::translate(modelmatrix, glm::vec3(-10.0, 0.0, 0.0));
+        lightShader.setMat4("model", modelmatrix);
+ 
+        lightShader.setMat4("modelmatrix", modelmatrix);
+        lightShader.setMat4("viewmatrix", viewmatrix);
+        lightShader.setMat4("projectionmatrix", projectionmatrix);
+
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+
 
         
         processInput(window); //Comprueba los inputs en cada frame
 
-
-        glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++)
-        {
-            glm::mat4 modelmatrix = glm::mat4(1.0f);
-            modelmatrix = glm::translate(modelmatrix, cubePositions[i]); //Usa glm transyoutulate para transladar la matriz usando el indice para usar los cubePosition definidos anteriormente
-            float angle = 20.0f * i; //Multiplica el angulo por el indice para que cada cubo este en un angulo distinto
-            modelmatrix = glm::rotate(modelmatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f)); //Cambia el modelmatrix
-            glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(modelmatrix)); //Manda el modelo al uniform
-
-            glDrawArrays(GL_TRIANGLES, 0, 36); //Lo dibuja
-        }
+        
 
 
         glfwSwapBuffers(window); //Cambia del buffer de renderizado al de color para mostrar la ventana.
         glfwPollEvents(); //Comprueba cosas como inputs del teclado etc, para actualizar la ventana cuando sea necesario.
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "OpenGL error before glClearColor: " << err << std::endl;
+        }
     }
 
 
@@ -424,7 +452,7 @@ void processInput(GLFWwindow* window) //Aqui proceso todos los inputs del teclad
         glfwSetWindowShouldClose(window, true);
     float cameraSpeed = 2.5f * deltaTime; //velocidad
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        cameraSpeed = 5.0f * deltaTime; //velocidad aumentada (correr)
+         cameraSpeed = 5.0f * deltaTime; //velocidad aumentada (correr)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

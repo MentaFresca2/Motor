@@ -27,6 +27,7 @@ int main()
     void framebuffer_size_callback(GLFWwindow * window, int width, int height);
     void processInput(GLFWwindow * window);
     void mouse_callback(GLFWwindow * window, double xpos, double ypos);
+    void printVec3(const glm::vec3 & v);
     //Definicion de funciones--------------------------------------------------------------
 
     
@@ -322,6 +323,16 @@ int main()
     
     while (!glfwWindowShouldClose(window)) //glfwWindowShouldClose Checkea si window se quiere cerrar y mientras no se quiera cerrar da false.
     {
+
+        //calculo del delta time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+
+
+
+        processInput(window); //Comprueba los inputs en cada frame
         glm::vec4 lightPos(1.2f, 1.0f, 2.0f,1.0);
 
         glm::mat4 modelmatrix2 = glm::mat4(1.0f);
@@ -331,11 +342,7 @@ int main()
         modelmatrix2 = glm::rotate(modelmatrix2, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0, 1.0, 0.0));
         modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(-10.0, 0.0, 0.0));
         lightPos = modelmatrix2 * lightPos; //Aqui le estoy aplicando el mismo modelo de rotacion que a la lampara para que asi la luz de la lampara se mueva acorde 
-
-        //calculo del delta time
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        
 
         glClearColor(0.094f, 0.094f, 0.094f, 1.0f); //Cambia el color de la ventana.
          //Limpia el buffer de profundudad para cambiarlo en el siguiente frame.
@@ -343,7 +350,7 @@ int main()
         
         shader.use(); //Bindea el shader para crear normales
         glBindVertexArray(VAO); //Bindea el vao para dibujar objetos normales
-       
+        shader.setVec3("viewPos", cameraPos);
         shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         shader.setVec3("lightPos", glm::vec3(lightPos.x, lightPos.y, lightPos.z));//Le paso la posicion de la luz a los objetos normales para la luz
         //Actualizacion de las matrices (se ponen aqui por si quieres mover algo a tiempo real)
@@ -351,7 +358,7 @@ int main()
         glm::mat4 modelmatrix = glm::mat4(1.0f);
        
         glm::mat4 viewmatrix;
-        viewmatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        viewmatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); //Camara montada (camera)
         glm::mat4 projectionmatrix = glm::mat4(1.0f);
         projectionmatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
@@ -368,7 +375,8 @@ int main()
         lightShader.use();//Usa el shader para la luz
         glBindVertexArray(lightVAO); //Bindea el Vao para fuentes de luz
         
-        lightShader.use();
+       
+        
         lightShader.setMat4("projection", projectionmatrix);
         lightShader.setMat4("view", viewmatrix);
         modelmatrix = glm::mat4(1.0f);
@@ -389,7 +397,7 @@ int main()
 
 
         
-        processInput(window); //Comprueba los inputs en cada frame
+       
 
         
 
@@ -411,7 +419,9 @@ int main()
 }
 
 
-
+void printVec3(const glm::vec3& v) {
+    std::cout << "vec3(" << v.x << ", " << v.y << ", " << v.z << ")" << std::endl;
+}
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if (firstMouse) //esto es para que cuando metas el raton en la ventana el raton este en el 000 y no en una esquina de la pantalla, ya que daria un salto

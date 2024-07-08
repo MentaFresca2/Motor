@@ -339,7 +339,7 @@ int main()
         modelmatrix2 = glm::mat4(1.0f);
         modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(0.0, 0.0, 0.0));
         modelmatrix2 = glm::scale(modelmatrix2, glm::vec3(0.2f)); // a smaller cube
-        modelmatrix2 = glm::rotate(modelmatrix2, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0, 1.0, 0.0));
+        modelmatrix2 = glm::rotate(modelmatrix2, (float)glfwGetTime() * glm::radians(00.0f), glm::vec3(0.0, 1.0, 0.0));
         modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(-10.0, 0.0, 0.0));
         lightPos = modelmatrix2 * lightPos; //Aqui le estoy aplicando el mismo modelo de rotacion que a la lampara para que asi la luz de la lampara se mueva acorde 
         
@@ -350,9 +350,26 @@ int main()
         
         shader.use(); //Bindea el shader para crear normales
         glBindVertexArray(VAO); //Bindea el vao para dibujar objetos normales
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        shader.setVec3("lightPos", glm::vec3(lightPos.x, lightPos.y, lightPos.z));//Le paso la posicion de la luz a los objetos normales para la luz
+        //Defino los valores de las propiedades de la luz (por si la fuente de luz es el sol o un foco o una linterna chiquita)
+        glm::vec3 objectColor = glm::vec3(1.0f); //Color del objeto
+        glm::vec3 lightColor; //Color de la luz
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // valores del diffuse y ambient
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+        shader.setVec3("light.ambient", ambientColor);
+        shader.setVec3("light.diffuse", diffuseColor);
+        shader.setVec3("light.specular", lightColor * 2.0f); //El * 2 hace que la luz especular sea del mismo colo pero mas brillante (Si la pones blanca brilla en la oscuridad xd)
+        shader.setVec3("light.position", glm::vec3(lightPos.x, lightPos.y, lightPos.z));
+        //Defino el material
+        shader.setVec3("material.ambient", objectColor);
+        shader.setVec3("material.diffuse", objectColor);
+        shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        shader.setFloat("material.shininess", 32.0f); //Necesitas que sea multiplo de 16
+        //Paso valores para calcular la luz
+        shader.setVec3("viewPos", cameraPos); //Posicion de la camara
+       
         //Actualizacion de las matrices (se ponen aqui por si quieres mover algo a tiempo real)
             //Creacion de las matrices
         glm::mat4 modelmatrix = glm::mat4(1.0f);
@@ -375,14 +392,15 @@ int main()
         lightShader.use();//Usa el shader para la luz
         glBindVertexArray(lightVAO); //Bindea el Vao para fuentes de luz
         
-       
-        
+
+
         lightShader.setMat4("projection", projectionmatrix);
         lightShader.setMat4("view", viewmatrix);
+        lightShader.setVec3("lightColor", lightColor);
         modelmatrix = glm::mat4(1.0f);
         modelmatrix = glm::translate(modelmatrix, glm::vec3(0.0,0.0,0.0));
         modelmatrix = glm::scale(modelmatrix, glm::vec3(0.2f)); // a smaller cube
-        modelmatrix = glm::rotate(modelmatrix, (float)glfwGetTime() * glm::radians(50.0f),glm::vec3(0.0,1.0,0.0));
+        modelmatrix = glm::rotate(modelmatrix, (float)glfwGetTime() * glm::radians(00.0f),glm::vec3(0.0,1.0,0.0));
         modelmatrix = glm::translate(modelmatrix, glm::vec3(-10.0, 0.0, 0.0));
         lightShader.setMat4("model", modelmatrix);
  

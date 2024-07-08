@@ -1,7 +1,7 @@
 #version 460 core
 out vec4 FragColor;
-
+uniform vec3 lightColor;
 void main()
 {
-    FragColor = vec4(1.0,1.0,1.0,1.0); // set all 4 vector values to 1.0 Esto es el colo que tendra el objeto que de la luz (O que de la sensacion que da luz)
+    FragColor = vec4(lightColor,1.0); // set all 4 vector values to 1.0 Esto es el colo que tendra el objeto que de la luz (O que de la sensacion que da luz)
 }

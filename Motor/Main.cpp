@@ -28,6 +28,7 @@ int main()
     void processInput(GLFWwindow * window);
     void mouse_callback(GLFWwindow * window, double xpos, double ypos);
     void printVec3(const glm::vec3 & v);
+    unsigned int loadTexture(char const* path);
     //Definicion de funciones--------------------------------------------------------------
 
     
@@ -199,66 +200,8 @@ int main()
 
     //Texturas
     //Sacas la informacion de la imagen.
-    int width, height, nrChannels; //Creo contenedores para el alto largo y colores.
-    stbi_set_flip_vertically_on_load(true); //Hago que las imagenes no esten volteadas (Opengl suele darles la vuelta)
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0); //Le digo la imagen que quiero usar y le doy los contenedores para que los rellene
-
-
-    unsigned int texture; //Creo un contenedor
-    glGenTextures(1, &texture); //Le digo el numero de texturas y el contenedor.
-    glActiveTexture(GL_TEXTURE0); //Le digo el numer ode textura a la que le voy a mandar al shader. (si fuera la segunda textura pues seria glActiveTexture(GL_TEXTURE1);)
-    glBindTexture(GL_TEXTURE_2D, texture); //Le asigno la textura (Le digo a opengl que la quiero configurar)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); //El primer parametro es el tipo de textura, el segundo es el axis (s,t,r == x,y,z) el tercero como queremos que se repita etc.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    //Si quisiera cambiar a que no se repita y tenga un borde, tendria que usar glTexParameterfv, que es el que admite floats y darle los colores de la siguiente manerag lTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);  
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//Esto cambia el filtro a tipo neares para los objetos pequeños (si tiene que decidir entre 4 pixeles se queda con el mas cercano)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //Esto para los grandes.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); //Esto para los minmaps pequeños
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //Esto para los minmaps grandes
-
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); //Esto genera la textura con toda la configuracion anterior
-        //Primer argumento: El tipo de textura con el que tratas
-        //Segundo argumento: El nivel de minmap que es la textura, 0 = a la maxima calidad
-        //Tercer argumento: El formato de colores de la textura.
-        //Cuarto argumento: Ancho
-        //Quinto argumento: Alto
-        //Sexto argumento: Siempre tiene que ser 0
-        //Septimo argumento: El formato de colores de la imagen original.
-        //Octavo argumento: El formato en el que esta guardada la imagen.
-        //Noveno argumento: Los datos de la imagen generados con stbi_load.
-        glGenerateMipmap(GL_TEXTURE_2D); //Genera el minmap a la que apunta opengl.
-
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data); //Despues de usar los datos de la imagen y generada la textura, estos ya no son necesarios y se liberan de la memoria.
-    unsigned int texture2; //Creo un contenedor
-    glGenTextures(1, &texture2); //Le digo el numero de texturas y el contenedor.
-    glActiveTexture(GL_TEXTURE1); //Le digo el numer ode textura a la que le voy a mandar al shader. (si fuera la segunda textura pues seria glActiveTexture(GL_TEXTURE1);)
-    glBindTexture(GL_TEXTURE_2D, texture2); //Le asigno la textura (Le digo a opengl que la quiero configurar)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); //El primer parametro es el tipo de textura, el segundo es el axis (s,t,r == x,y,z) el tercero como queremos que se repita etc.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    //Si quisiera cambiar a que no se repita y tenga un borde, tendria que usar glTexParameterfv, que es el que admite floats y darle los colores de la siguiente manerag lTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);  
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//Esto cambia el filtro a tipo neares para los objetos pequeños (si tiene que decidir entre 4 pixeles se queda con el mas cercano)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //Esto para los grandes.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); //Esto para los minmaps pequeños
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //Esto para los minmaps grandes
-
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
+    unsigned int diffuseMap = loadTexture("container2.png");
+    unsigned int specularMap = loadTexture("container2_specular.png");
 
 
 
@@ -353,9 +296,9 @@ int main()
         //Defino los valores de las propiedades de la luz (por si la fuente de luz es el sol o un foco o una linterna chiquita)
         glm::vec3 objectColor = glm::vec3(1.0f); //Color del objeto
         glm::vec3 lightColor; //Color de la luz
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        lightColor.x = 1.0f;
+        lightColor.y = 1.0f;
+        lightColor.z = 1.0f;
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // valores del diffuse y ambient
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
         shader.setVec3("light.ambient", ambientColor);
@@ -363,15 +306,15 @@ int main()
         shader.setVec3("light.specular", lightColor * 2.0f); //El * 2 hace que la luz especular sea del mismo colo pero mas brillante (Si la pones blanca brilla en la oscuridad xd)
         shader.setVec3("light.position", glm::vec3(lightPos.x, lightPos.y, lightPos.z));
         //Defino el material
-        shader.setVec3("material.ambient", objectColor);
-        shader.setVec3("material.diffuse", objectColor);
-        shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        
+        shader.setInt("material.diffuse", 0);
+        shader.setInt("material.specular", 1);
         shader.setFloat("material.shininess", 32.0f); //Necesitas que sea multiplo de 16
         //Paso valores para calcular la luz
         shader.setVec3("viewPos", cameraPos); //Posicion de la camara
        
-        //Actualizacion de las matrices (se ponen aqui por si quieres mover algo a tiempo real)
-            //Creacion de las matrices
+        //Camara
+        //Creacion de las matrices
         glm::mat4 modelmatrix = glm::mat4(1.0f);
        
         glm::mat4 viewmatrix;
@@ -384,11 +327,19 @@ int main()
         shader.setMat4("modelmatrix", modelmatrix);
         shader.setMat4("viewmatrix", viewmatrix);
         shader.setMat4("projectionmatrix", projectionmatrix);
-        //El primer argumento es que primitivos dibujar.
-        //El segundo argumento es la cantidad de indices que usas, 6 en este caso.
-        //El tercer argumento es el tipo de dato que usas para los vertices.
-        //El cuarto es donde empieza el EBO, en 0 en este caso.
+        //Termina la camara y activo las texturas
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+
+
+
         lightShader.use();//Usa el shader para la luz
         glBindVertexArray(lightVAO); //Bindea el Vao para fuentes de luz
         
@@ -435,8 +386,6 @@ int main()
     glfwTerminate(); //Borra todos los recursos usados, para que dejen de usar espacio en tu ordenador mientras no se ejecuta.
     return 0;
 }
-
-
 void printVec3(const glm::vec3& v) {
     std::cout << "vec3(" << v.x << ", " << v.y << ", " << v.z << ")" << std::endl;
 }
@@ -473,7 +422,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction); //Lo normaliza para mandarlo hacia donde tiene que mirar la camara
 }
-
 void processInput(GLFWwindow* window) //Aqui proceso todos los inputs del teclado, raton etc (botones).
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) //Si se presiona el escape se cierra la ventana (glfwSetWindowShouldClose para window pasa a true).
@@ -498,4 +446,39 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) //Func
 {
     glViewport(0, 0, width, height);
 }
+unsigned int loadTexture(char const* path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
 
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0); //Usa stbi para cargar los datos
+    if (data) //Comprueba errores y si no tiene pasa la textura al buffer que toca
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
+}

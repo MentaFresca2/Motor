@@ -19,6 +19,9 @@
     <Filter Include="Archivos de recursos\LightShader">
       <UniqueIdentifier>{16bdd283-9490-4054-a1a2-c59fbd667660}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de recursos\Img">
+      <UniqueIdentifier>{357cb03e-c18c-4e57-9032-d58b55216de2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -51,14 +54,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="container.jpg">
-      <Filter>Archivos de recursos</Filter>
-    </Image>
     <Image Include="Pene.png">
-      <Filter>Archivos de recursos</Filter>
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="container2_specular.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="container2.png">
+      <Filter>Archivos de recursos\Img</Filter>
+    </Image>
+    <Image Include="container.jpg">
+      <Filter>Archivos de recursos\Img</Filter>
     </Image>
     <Image Include="awesomeface.png">
-      <Filter>Archivos de recursos</Filter>
+      <Filter>Archivos de recursos\Img</Filter>
     </Image>
   </ItemGroup>
 </Project>

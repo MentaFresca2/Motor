@@ -272,18 +272,19 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-
+        //Posicion del cubo y la luz
+        glm::vec3 finalpos = glm::vec3(0.0f, 0.0f, 10.0f);
 
 
         processInput(window); //Comprueba los inputs en cada frame
-        glm::vec4 lightPos(1.2f, 1.0f, 2.0f,1.0);
+        glm::vec4 lightPos(0.0f, 0.0f, 0.0f,1.0f); //NO TOCAR (es la posicion iniciar antes del translado en la matriz XD)
 
         glm::mat4 modelmatrix2 = glm::mat4(1.0f);
         modelmatrix2 = glm::mat4(1.0f);
-        modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(0.0, 0.0, 0.0));
+        modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(0.0f, 0.0f, 0.0f));
         modelmatrix2 = glm::scale(modelmatrix2, glm::vec3(0.2f)); // a smaller cube
         modelmatrix2 = glm::rotate(modelmatrix2, (float)glfwGetTime() * glm::radians(00.0f), glm::vec3(0.0, 1.0, 0.0));
-        modelmatrix2 = glm::translate(modelmatrix2, glm::vec3(-10.0, 0.0, 0.0));
+        modelmatrix2 = glm::translate(modelmatrix2, finalpos);
         lightPos = modelmatrix2 * lightPos; //Aqui le estoy aplicando el mismo modelo de rotacion que a la lampara para que asi la luz de la lampara se mueva acorde 
         
 
@@ -309,7 +310,7 @@ int main()
         
         shader.setInt("material.diffuse", 0);
         shader.setInt("material.specular", 1);
-        shader.setFloat("material.shininess", 32.0f); //Necesitas que sea multiplo de 16
+        shader.setFloat("material.shininess", 32.0f); //Necesitas que sea multiplo de 16 (luz especular)
         //Paso valores para calcular la luz
         shader.setVec3("viewPos", cameraPos); //Posicion de la camara
        
@@ -322,8 +323,8 @@ int main()
         glm::mat4 projectionmatrix = glm::mat4(1.0f);
         projectionmatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
-
-       
+        glm::mat3 inversemodelmatrix = glm::mat3(transpose(inverse(modelmatrix)));
+        shader.setMat3("inversemodelmatrix", inversemodelmatrix);
         shader.setMat4("modelmatrix", modelmatrix);
         shader.setMat4("viewmatrix", viewmatrix);
         shader.setMat4("projectionmatrix", projectionmatrix);
@@ -349,13 +350,13 @@ int main()
         lightShader.setMat4("view", viewmatrix);
         lightShader.setVec3("lightColor", lightColor);
         modelmatrix = glm::mat4(1.0f);
-        modelmatrix = glm::translate(modelmatrix, glm::vec3(0.0,0.0,0.0));
-        modelmatrix = glm::scale(modelmatrix, glm::vec3(0.2f)); // a smaller cube
-        modelmatrix = glm::rotate(modelmatrix, (float)glfwGetTime() * glm::radians(00.0f),glm::vec3(0.0,1.0,0.0));
-        modelmatrix = glm::translate(modelmatrix, glm::vec3(-10.0, 0.0, 0.0));
-        lightShader.setMat4("model", modelmatrix);
+        modelmatrix = glm::translate(modelmatrix, glm::vec3(0.0f,0.0f,0.0f));
+        modelmatrix = glm::scale(modelmatrix, glm::vec3(0.2f)); //a smaller cube
+        modelmatrix = glm::rotate(modelmatrix, (float)glfwGetTime() * glm::radians(00.0f),glm::vec3(0.0f,1.0f,0.0f));
+        modelmatrix = glm::translate(modelmatrix, finalpos);
+        
  
-        lightShader.setMat4("modelmatrix", modelmatrix);
+        lightShader.setMat4("modelmatrix", modelmatrix); //Aqui le aplico rotacion etc (Bueno le paso la matriz para que lo haga la gpu xd)
         lightShader.setMat4("viewmatrix", viewmatrix);
         lightShader.setMat4("projectionmatrix", projectionmatrix);
 

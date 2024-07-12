@@ -3,22 +3,25 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoord;
 layout (location = 2) in vec3 aNormal;
-out vec2 TexCoord;
+out vec2 TexCoord; //Todos los outs que salgan del vertex shader se transpolaran a pixel por pixel (vertex)
 out vec3 Normal;
 out vec3 FragPos;  
 
-
-
-
 //Matrices
+//Recuerda calcular las matrices en la cpu o la grafica muere xd
+uniform mat3 inversemodelmatrix;
 uniform mat4 modelmatrix;
 uniform mat4 viewmatrix;
 uniform mat4 projectionmatrix;
+
+
 void main()
 {
 	
 	FragPos = vec3(modelmatrix * vec4(aPos, 1.0)); //Fragment position, no es mas que una coordenada del mundo representada en pantalla, (opengl render pipeline se encarga de rellenar el resto :3)
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
-	Normal = aNormal;
+	TexCoord = aTexCoord;
+	Normal = inversemodelmatrix * aNormal; //Tengo que tranformar un vector no normal por eso uso el modelo inverso
+
+	//Basicamente hace que los vectores que miraban en direcciones no normales por modificar cosas sin normalizar se normalizen
 	gl_Position = projectionmatrix * viewmatrix * modelmatrix * vec4(aPos, 1.0f);
 }
